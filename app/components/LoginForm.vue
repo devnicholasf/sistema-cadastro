@@ -45,6 +45,7 @@
           label="Email"
           placeholder="seu@email.com"
           required
+          :error-message="emailError"
         />
         
         <BaseInput
@@ -53,6 +54,7 @@
           label="Senha"
           placeholder="Digite sua senha"
           required
+          :error-message="passwordError"
         />
 
         <BaseButton
@@ -126,8 +128,8 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
 import BaseInput from '~/components/BaseInput.vue'
 import BaseButton from '~/components/BaseButton.vue'
 
@@ -150,13 +152,56 @@ const registerForm = ref({
   confirmPassword: ''
 })
 
+// Estados de validação
+const emailError = ref('')
+const passwordError = ref('')
+
+// Função para validar email
+const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email)
+}
+
+// Função para limpar erros de validação
+const clearValidationErrors = () => {
+  emailError.value = ''
+  passwordError.value = ''
+}
+
+// Função de validação do formulário de login
+const validateLoginForm = (): boolean => {
+  clearValidationErrors()
+  let isValid = true
+
+  // Validar email
+  if (!loginForm.value.email) {
+    emailError.value = 'Email é obrigatório'
+    isValid = false
+  } else if (!isValidEmail(loginForm.value.email)) {
+    emailError.value = 'Por favor, digite um email válido'
+    isValid = false
+  }
+
+  // Validar senha
+  if (!loginForm.value.password) {
+    passwordError.value = 'Senha é obrigatória'
+    isValid = false
+  } else if (loginForm.value.password.length < 6) {
+    passwordError.value = 'Senha deve ter pelo menos 6 caracteres'
+    isValid = false
+  }
+
+  return isValid
+}
+
 // Função de login
 const handleLogin = async () => {
   // Limpar erros anteriores
   clearError()
+  clearValidationErrors()
   
-  // Validação básica
-  if (!loginForm.value.email || !loginForm.value.password) {
+  // Validar formulário
+  if (!validateLoginForm()) {
     return
   }
 
@@ -177,8 +222,18 @@ const handleRegister = () => {
   // TODO: Implementar lógica de registro
 }
 
-// Limpar erro quando trocar de aba
+// Limpar erros quando trocar de aba ou digitar
 watch(activeTab, () => {
   clearError()
+  clearValidationErrors()
+})
+
+// Limpar erro específico do campo quando usuário começar a digitar
+watch(() => loginForm.value.email, () => {
+  if (emailError.value) emailError.value = ''
+})
+
+watch(() => loginForm.value.password, () => {
+  if (passwordError.value) passwordError.value = ''
 })
 </script>

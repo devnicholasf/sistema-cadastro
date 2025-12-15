@@ -13,7 +13,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import LoginForm from '~/components/LoginForm.vue'
 
 // Head da página
