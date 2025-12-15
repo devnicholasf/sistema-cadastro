@@ -59,10 +59,18 @@
           variant="primary"
           size="lg"
           class="w-full mt-6"
+          :loading="loading"
           @click="handleLogin"
         >
-          Entrar
+          {{ loading ? 'Entrando...' : 'Entrar' }}
         </BaseButton>
+
+        <!-- Mensagem de erro -->
+        <div v-if="error" class="mt-4 p-3 bg-error-500/10 border border-error-500 rounded-lg">
+          <p class="text-error-500 text-sm text-center">
+            {{ error }}
+          </p>
+        </div>
 
         <p class="text-center text-sm text-text-muted mt-4">
           Esqueceu sua senha? 
@@ -123,6 +131,9 @@ import { ref } from 'vue'
 import BaseInput from '~/components/BaseInput.vue'
 import BaseButton from '~/components/BaseButton.vue'
 
+// Composable de autenticação
+const { login, loading, error, clearError } = useAuth()
+
 // Estado das abas
 const activeTab = ref('login')
 
@@ -139,12 +150,35 @@ const registerForm = ref({
   confirmPassword: ''
 })
 
-// Funções placeholder (sem implementação)
-const handleLogin = () => {
-  // TODO: Implementar lógica de login
+// Função de login
+const handleLogin = async () => {
+  // Limpar erros anteriores
+  clearError()
+  
+  // Validação básica
+  if (!loginForm.value.email || !loginForm.value.password) {
+    return
+  }
+
+  try {
+    const result = await login(loginForm.value.email, loginForm.value.password)
+    
+    if (result.success) {
+      // Login bem-sucedido, o composable já faz o redirect
+      console.log('Login realizado com sucesso!')
+    }
+  } catch (err) {
+    console.error('Erro no login:', err)
+  }
 }
 
+// Função placeholder para registro (será implementada depois)
 const handleRegister = () => {
   // TODO: Implementar lógica de registro
 }
+
+// Limpar erro quando trocar de aba
+watch(activeTab, () => {
+  clearError()
+})
 </script>
