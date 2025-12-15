@@ -84,6 +84,71 @@ export const useAuth = () => {
     }
   }
 
+  // Função de registro
+  const register = async (name: string, email: string, password: string) => {
+    try {
+      loading.value = true
+      error.value = null
+
+      const { data, error: registerError } = await $supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            full_name: name,
+            display_name: name
+          }
+        }
+      })
+
+      if (registerError) {
+        throw registerError
+      }
+
+      // Se a conta foi criada com sucesso
+      if (data.user) {
+        user.value = data.user
+        
+        // Redirecionar para a página principal após registro bem-sucedido
+        await navigateTo('/')
+        return { success: true, user: data.user }
+      }
+      
+      return { success: false, error: 'Erro inesperado ao criar conta' }
+    } catch (err) {
+      console.error('Erro no registro:', err)
+      const errorMessage = getRegisterErrorMessage(err)
+      error.value = errorMessage
+      return { success: false, error: errorMessage }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Função para mapear erros de registro
+  const getRegisterErrorMessage = (error: any): string => {
+    // Usuário já existe
+    if (error.message?.includes('User already registered') ||
+        error.message?.includes('already registered')) {
+      return 'Este email já está cadastrado. Tente fazer login ou use outro email.'
+    }
+    
+    // Senha muito fraca
+    if (error.message?.includes('Password should be at least') ||
+        error.message?.includes('weak password')) {
+      return 'Senha muito fraca. Use pelo menos 6 caracteres com letras e números.'
+    }
+    
+    // Email inválido
+    if (error.message?.includes('Invalid email') ||
+        error.message?.includes('invalid email')) {
+      return 'Email inválido. Verifique o formato do seu email.'
+    }
+    
+    // Usar o mapeamento geral de erros como fallback
+    return getErrorMessage(error)
+  }
+
   // Função de logout
   const logout = async () => {
     try {
@@ -138,6 +203,7 @@ export const useAuth = () => {
     
     // Métodos
     login,
+    register,
     logout,
     checkSession,
     clearError

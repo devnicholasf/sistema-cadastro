@@ -1,12 +1,7 @@
 <template>
   <div class="min-h-screen bg-background-primary">
-    <!-- Loading state -->
-    <div v-if="pending" class="flex items-center justify-center min-h-screen">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-orange"></div>
-    </div>
-
     <!-- Dashboard para usuário logado -->
-    <div v-else-if="isAuthenticated" class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-4 py-8">
       <div class="max-w-4xl mx-auto">
         <!-- Header da dashboard -->
         <div class="bg-background-secondary rounded-lg shadow-lg p-6 mb-8">
@@ -64,14 +59,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Redirecionamento para login se não autenticado -->
-    <div v-else class="flex items-center justify-center min-h-screen">
-      <div class="text-center">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-orange mx-auto mb-4"></div>
-        <p class="text-text-secondary">Redirecionando para login...</p>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -83,23 +70,7 @@ definePageMeta({
 })
 
 // Composable de autenticação
-const { user, isAuthenticated, logout, loading, checkSession } = useAuth()
-
-// Estado de carregamento inicial
-const pending = ref(true)
-
-// Verificar sessão ao montar componente
-onMounted(async () => {
-  await checkSession()
-  
-  // Se não estiver autenticado, redirecionar para login
-  if (!isAuthenticated.value) {
-    await navigateTo('/login')
-    return
-  }
-  
-  pending.value = false
-})
+const { user, logout, loading } = useAuth()
 
 // Head da página
 useHead({

@@ -85,19 +85,30 @@
       <!-- Register Tab -->
       <div v-if="activeTab === 'register'" class="space-y-4">
         <BaseInput
+          v-model="registerForm.name"
+          type="text"
+          label="Nome Completo"
+          placeholder="Seu nome completo"
+          required
+          :error-message="nameError"
+        />
+        
+        <BaseInput
           v-model="registerForm.email"
           type="email"
           label="Email"
           placeholder="seu@email.com"
           required
+          :error-message="emailError"
         />
         
         <BaseInput
           v-model="registerForm.password"
           type="password"
           label="Senha"
-          placeholder="Digite sua senha"
+          placeholder="Digite sua senha (mínimo 6 caracteres)"
           required
+          :error-message="passwordError"
         />
 
         <BaseInput
@@ -106,16 +117,25 @@
           label="Confirmar Senha"
           placeholder="Confirme sua senha"
           required
+          :error-message="confirmPasswordError"
         />
 
         <BaseButton
           variant="primary"
           size="lg"
           class="w-full mt-6"
+          :loading="loading"
           @click="handleRegister"
         >
-          Criar Conta
+          {{ loading ? 'Criando conta...' : 'Criar Conta' }}
         </BaseButton>
+
+        <!-- Mensagem de erro -->
+        <div v-if="error" class="mt-4 p-3 bg-error-500/10 border border-error-500 rounded-lg">
+          <p class="text-error-500 text-sm text-center">
+            {{ error }}
+          </p>
+        </div>
 
         <p class="text-center text-sm text-text-muted mt-4">
           Ao criar uma conta, você concorda com nossos 
@@ -134,7 +154,7 @@ import BaseInput from '~/components/BaseInput.vue'
 import BaseButton from '~/components/BaseButton.vue'
 
 // Composable de autenticação
-const { login, loading, error, clearError } = useAuth()
+const { login, register, loading, error, clearError } = useAuth()
 
 // Estado das abas
 const activeTab = ref('login')
@@ -147,6 +167,7 @@ const loginForm = ref({
 
 // Formulário de registro
 const registerForm = ref({
+  name: '',
   email: '',
   password: '',
   confirmPassword: ''
@@ -155,6 +176,8 @@ const registerForm = ref({
 // Estados de validação
 const emailError = ref('')
 const passwordError = ref('')
+const nameError = ref('')
+const confirmPasswordError = ref('')
 
 // Função para validar email
 const isValidEmail = (email: string): boolean => {
@@ -166,6 +189,8 @@ const isValidEmail = (email: string): boolean => {
 const clearValidationErrors = () => {
   emailError.value = ''
   passwordError.value = ''
+  nameError.value = ''
+  confirmPasswordError.value = ''
 }
 
 // Função de validação do formulário de login
@@ -217,9 +242,83 @@ const handleLogin = async () => {
   }
 }
 
+// Função de validação do formulário de registro
+const validateRegisterForm = (): boolean => {
+  clearValidationErrors()
+  let isValid = true
+
+  // Validar nome
+  if (!registerForm.value.name.trim()) {
+    nameError.value = 'Nome é obrigatório'
+    isValid = false
+  } else if (registerForm.value.name.trim().length < 2) {
+    nameError.value = 'Nome deve ter pelo menos 2 caracteres'
+    isValid = false
+  }
+
+  // Validar email
+  if (!registerForm.value.email) {
+    emailError.value = 'Email é obrigatório'
+    isValid = false
+  } else if (!isValidEmail(registerForm.value.email)) {
+    emailError.value = 'Por favor, digite um email válido'
+    isValid = false
+  }
+
+  // Validar senha
+  if (!registerForm.value.password) {
+    passwordError.value = 'Senha é obrigatória'
+    isValid = false
+  } else if (registerForm.value.password.length < 6) {
+    passwordError.value = 'Senha deve ter pelo menos 6 caracteres'
+    isValid = false
+  }
+
+  // Validar confirmação de senha
+  if (!registerForm.value.confirmPassword) {
+    confirmPasswordError.value = 'Confirmação de senha é obrigatória'
+    isValid = false
+  } else if (registerForm.value.password !== registerForm.value.confirmPassword) {
+    confirmPasswordError.value = 'Senhas não conferem'
+    isValid = false
+  }
+
+  return isValid
+}
+
 // Função placeholder para registro (será implementada depois)
-const handleRegister = () => {
-  // TODO: Implementar lógica de registro
+const handleRegister = async () => {
+  // Limpar erros anteriores
+  clearError()
+  clearValidationErrors()
+  
+  // Validar formulário
+  if (!validateRegisterForm()) {
+    return
+  }
+
+  try {
+    const result = await register(
+      registerForm.value.name.trim(),
+      registerForm.value.email,
+      registerForm.value.password
+    )
+    
+    if (result.success) {
+      // Registro e login automático bem-sucedido
+      console.log('Conta criada e login realizado!')
+      
+      // Limpar formulário
+      registerForm.value = {
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+      }
+    }
+  } catch (err) {
+    console.error('Erro no registro:', err)
+  }
 }
 
 // Limpar erros quando trocar de aba ou digitar
@@ -235,5 +334,22 @@ watch(() => loginForm.value.email, () => {
 
 watch(() => loginForm.value.password, () => {
   if (passwordError.value) passwordError.value = ''
+})
+
+// Watches para formulário de registro
+watch(() => registerForm.value.name, () => {
+  if (nameError.value) nameError.value = ''
+})
+
+watch(() => registerForm.value.email, () => {
+  if (emailError.value) emailError.value = ''
+})
+
+watch(() => registerForm.value.password, () => {
+  if (passwordError.value) passwordError.value = ''
+})
+
+watch(() => registerForm.value.confirmPassword, () => {
+  if (confirmPasswordError.value) confirmPasswordError.value = ''
 })
 </script>
