@@ -6,6 +6,9 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss'
   ],
+  devServer: {
+    port: 3001
+  },
   runtimeConfig: {
     public: {
       supabaseUrl: process.env.SUPABASE_URL,

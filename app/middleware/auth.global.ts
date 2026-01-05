@@ -1,6 +1,11 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
+  console.log('🔒 Middleware executando para:', to.path)
+  
   // Não executar middleware no lado do servidor para evitar problemas de hidratação
-  if (process.server) return
+  if (process.server) {
+    console.log('🔒 Skipping middleware no servidor')
+    return
+  }
 
   const { isAuthenticated, checkSession, user } = useAuth()
   
