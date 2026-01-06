@@ -48,6 +48,47 @@ export const useFuncionarios = () => {
     }
   }
 
+  // Função para criar novo funcionário
+  const createFuncionario = async (funcionario: CreateFuncionario) => {
+    try {
+      loading.value = true
+      error.value = null
+
+      const { data, error: createError } = await $supabase
+        .from('funcionarios')
+        .insert([funcionario])
+        .select()
+        .single()
+
+      if (createError) {
+        throw createError
+      }
+
+      // Adicionar o novo funcionário à lista local
+      if (data) {
+        funcionarios.value.push(data)
+      }
+
+      return {
+        success: true,
+        data: data,
+        message: 'Funcionário criado com sucesso!'
+      }
+    } catch (err) {
+      console.error('Erro ao criar funcionário:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao criar funcionário'
+      error.value = errorMessage
+      
+      return {
+        success: false,
+        error: errorMessage,
+        message: 'Erro ao criar funcionário'
+      }
+    } finally {
+      loading.value = false
+    }
+  }
+
   // Limpar erro
   const clearError = () => {
     error.value = null
@@ -66,6 +107,7 @@ export const useFuncionarios = () => {
     
     // Métodos
     fetchFuncionarios,
+    createFuncionario,
     clearError,
     clearFuncionarios
   }
