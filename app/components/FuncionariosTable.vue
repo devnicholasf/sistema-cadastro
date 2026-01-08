@@ -86,13 +86,21 @@
               </span>
             </td>
             <td class="py-4 px-4">
-              <div class="flex justify-center">
+              <div class="flex justify-center space-x-2">
                 <BaseButton
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
                   @click="editarFuncionario(funcionario.id)"
                 >
                   Editar
+                </BaseButton>
+                
+                <BaseButton
+                  variant="danger"
+                  size="sm"
+                  @click="confirmarDeletar(funcionario)"
+                >
+                  Deletar
                 </BaseButton>
               </div>
             </td>
@@ -106,14 +114,40 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal de confirmação para deletar -->
+  <ConfirmModal
+    :is-open="showDeleteModal"
+    title="Deletar Funcionário"
+    :message="deleteMessage"
+    confirm-text="Deletar"
+    cancel-text="Cancelar"
+    :loading="deletandoFuncionario"
+    @confirm="deletarFuncionario"
+    @cancel="cancelarDeletar"
+  />
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import BaseButton from '~/components/BaseButton.vue'
+import ConfirmModal from '~/components/ConfirmModal.vue'
+import type { Funcionario } from '~/types/funcionarios'
 
 // Composable dos funcionários
-const { funcionarios, loading, error, fetchFuncionarios, clearError } = useFuncionarios()
+const { funcionarios, loading, error, fetchFuncionarios, deleteFuncionario, clearError } = useFuncionarios()
+const { showSuccess, showError } = useNotifications()
+
+// Estados para modal de deleção
+const showDeleteModal = ref(false)
+const funcionarioParaDeletar = ref<Funcionario | null>(null)
+const deletandoFuncionario = ref(false)
+
+// Computed para mensagem do modal
+const deleteMessage = computed(() => {
+  if (!funcionarioParaDeletar.value) return ''
+  return `Tem certeza que deseja deletar o funcionário "${funcionarioParaDeletar.value.nome}"? Esta ação não pode ser desfeita.`
+})
 
 // Função para recarregar dados
 const handleRefresh = async () => {
@@ -124,6 +158,42 @@ const handleRefresh = async () => {
 // Função para editar funcionário
 const editarFuncionario = (id: number) => {
   navigateTo(`/funcionario/editar/${id}`)
+}
+
+// Função para confirmar deleção
+const confirmarDeletar = (funcionario: Funcionario) => {
+  funcionarioParaDeletar.value = funcionario
+  showDeleteModal.value = true
+}
+
+// Função para cancelar deleção
+const cancelarDeletar = () => {
+  showDeleteModal.value = false
+  funcionarioParaDeletar.value = null
+}
+
+// Função para deletar funcionário
+const deletarFuncionario = async () => {
+  if (!funcionarioParaDeletar.value) return
+
+  deletandoFuncionario.value = true
+  
+  try {
+    const result = await deleteFuncionario(funcionarioParaDeletar.value.id)
+    
+    if (result.success) {
+      showSuccess(`Funcionário "${funcionarioParaDeletar.value.nome}" deletado com sucesso!`)
+      showDeleteModal.value = false
+      funcionarioParaDeletar.value = null
+    } else {
+      showError(result.error || 'Erro ao deletar funcionário')
+    }
+  } catch (error) {
+    console.error('Erro ao deletar funcionário:', error)
+    showError('Erro inesperado ao deletar funcionário')
+  } finally {
+    deletandoFuncionario.value = false
+  }
 }
 
 // Buscar funcionários ao montar o componente

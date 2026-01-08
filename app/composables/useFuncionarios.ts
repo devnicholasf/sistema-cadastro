@@ -190,6 +190,49 @@ export const useFuncionarios = () => {
     }
   }
 
+  // Função para deletar funcionário
+  const deleteFuncionario = async (id: number): Promise<{ success: boolean; error?: string }> => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const { error: deleteError } = await $supabase
+        .from('funcionarios')
+        .delete()
+        .eq('id', id)
+
+      if (deleteError) {
+        console.error('Erro ao deletar funcionário:', deleteError)
+        const errorMessage = deleteError.message || 'Erro ao deletar funcionário'
+        error.value = errorMessage
+        
+        return { 
+          success: false, 
+          error: errorMessage 
+        }
+      }
+
+      // Remover do cache local
+      const index = funcionarios.value.findIndex(f => f.id === id)
+      if (index !== -1) {
+        funcionarios.value.splice(index, 1)
+      }
+
+      return { success: true }
+    } catch (err) {
+      console.error('Erro inesperado ao deletar funcionário:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Erro inesperado ao deletar funcionário'
+      error.value = errorMessage
+      
+      return {
+        success: false,
+        error: errorMessage
+      }
+    } finally {
+      loading.value = false
+    }
+  }
+
   // Limpar erro
   const clearError = () => {
     error.value = null
@@ -211,6 +254,7 @@ export const useFuncionarios = () => {
     createFuncionario,
     buscarFuncionarioPorId,
     updateFuncionario,
+    deleteFuncionario,
     clearError,
     clearFuncionarios
   }

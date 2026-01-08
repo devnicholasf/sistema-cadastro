@@ -35,15 +35,29 @@
 
         <!-- Action Buttons -->
         <div class="hidden md:flex items-center space-x-3">
-          <NuxtLink
-            to="/login"
-            class="text-text-secondary hover:text-accent-orange transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-surface-primary"
-          >
-            Login
-          </NuxtLink>
-          <button class="bg-accent-gradient text-text-primary px-4 py-2 rounded-lg font-medium hover:shadow-glow hover:scale-105 transition-all duration-200">
-            Cadastrar
-          </button>
+          <div v-if="isAuthenticated" class="flex items-center space-x-3">
+            <span class="text-text-secondary text-sm">
+              {{ user?.email }}
+            </span>
+            <BaseButton
+              variant="outline"
+              size="sm"
+              @click="handleLogout"
+            >
+              Sair
+            </BaseButton>
+          </div>
+          <div v-else class="flex items-center space-x-3">
+            <NuxtLink
+              to="/login"
+              class="text-text-secondary hover:text-accent-orange transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-surface-primary"
+            >
+              Login
+            </NuxtLink>
+            <button class="bg-accent-gradient text-text-primary px-4 py-2 rounded-lg font-medium hover:shadow-glow hover:scale-105 transition-all duration-200">
+              Cadastrar
+            </button>
+          </div>
         </div>
 
         <!-- Mobile Menu Button -->
@@ -94,7 +108,20 @@
           >
             Novo Cadastro
           </NuxtLink>
-          <div class="flex flex-col space-y-2 pt-2 border-t border-border-primary">
+          <div v-if="isAuthenticated" class="flex flex-col space-y-2 pt-2 border-t border-border-primary">
+            <span class="text-text-secondary text-sm py-2">
+              {{ user?.email }}
+            </span>
+            <BaseButton
+              variant="outline"
+              size="sm"
+              @click="handleLogout"
+              class="text-left"
+            >
+              Sair
+            </BaseButton>
+          </div>
+          <div v-else class="flex flex-col space-y-2 pt-2 border-t border-border-primary">
             <NuxtLink
               to="/login"
               @click="closeMobileMenu"
@@ -114,6 +141,11 @@
 
 <script setup>
 import { ref } from 'vue'
+import BaseButton from '~/components/BaseButton.vue'
+
+// Composable de autenticação
+const { user, isAuthenticated, logout } = useAuth()
+const { showSuccess } = useNotifications()
 
 const isMobileMenuOpen = ref(false)
 
@@ -123,5 +155,12 @@ const toggleMobileMenu = () => {
 
 const closeMobileMenu = () => {
   isMobileMenuOpen.value = false
+}
+
+const handleLogout = async () => {
+  await logout()
+  showSuccess('Logout realizado com sucesso!')
+  closeMobileMenu()
+  navigateTo('/login')
 }
 </script>

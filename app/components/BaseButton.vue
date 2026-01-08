@@ -77,7 +77,7 @@ const buttonClasses = computed(() => {
     secondary: 'bg-surface-primary border border-border-primary text-text-primary hover:bg-hover-background hover:border-border-accent',
     outline: 'border border-border-accent text-accent-orange hover:bg-accent-orange hover:text-text-inverse',
     ghost: 'text-accent-orange hover:bg-surface-primary hover:text-text-primary',
-    danger: 'bg-error-500 text-white hover:bg-error-600 hover:shadow-lg'
+    danger: 'bg-red-600 text-white hover:bg-red-700 hover:shadow-lg focus:ring-red-500'
   }
   
   const sizeClasses = {
