@@ -88,7 +88,7 @@
             <td class="py-4 px-4">
               <div class="flex justify-center space-x-2">
                 <BaseButton
-                  variant="secondary"
+                  variant="primary"
                   size="sm"
                   @click="editarFuncionario(funcionario.id)"
                 >

@@ -5,22 +5,15 @@
       <div class="max-w-4xl mx-auto">
         <!-- Header da dashboard -->
         <div class="bg-background-secondary rounded-lg shadow-lg p-6 mb-8">
-          <div class="flex items-center justify-between">
-            <div>
+          <div class="flex items-center justify-center">
+            <div class="text-center">
               <h1 class="text-3xl font-bold text-text-primary mb-2">
-                Bem-vindo, {{ user?.email }}!
+                Bem-vindo, {{ user?.user_metadata?.full_name || user?.email }}!
               </h1>
               <p class="text-text-secondary">
                 Você está logado no sistema
               </p>
             </div>
-            <BaseButton 
-              variant="outline" 
-              @click="logout"
-              :loading="loading"
-            >
-              Sair
-            </BaseButton>
           </div>
         </div>
         
@@ -34,7 +27,6 @@
 </template>
 
 <script setup lang="ts">
-import BaseButton from '~/components/BaseButton.vue'
 import FuncionariosTable from '~/components/FuncionariosTable.vue'
 
 definePageMeta({
@@ -42,7 +34,7 @@ definePageMeta({
 })
 
 // Composable de autenticação
-const { user, logout, loading } = useAuth()
+const { user } = useAuth()
 
 // Head da página
 useHead({
