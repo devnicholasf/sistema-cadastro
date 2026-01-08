@@ -94,7 +94,7 @@ import BaseDropdown from '~/components/BaseDropdown.vue'
 import type { CreateFuncionario, Funcionario } from '~/types/funcionarios'
 
 // Composables
-const { createFuncionario } = useFuncionarios()
+const { createFuncionario, updateFuncionario } = useFuncionarios()
 const { showSuccess, showError, showInfo } = useNotifications()
 
 // Props
@@ -224,9 +224,24 @@ const handleSubmit = async () => {
         showError(result.error || 'Erro ao cadastrar funcionário')
       }
     } else {
-      // TODO: Implementar edição
-      console.log('Editar funcionário:', formData)
-      showInfo('Funcionalidade de edição será implementada em breve')
+      // Editar funcionário existente
+      if (!props.funcionario?.id) {
+        showError('ID do funcionário não encontrado')
+        return
+      }
+
+      const result = await updateFuncionario(props.funcionario.id, formData)
+      
+      if (result.success) {
+        showSuccess('Funcionário atualizado com sucesso!')
+        
+        // Redirecionar para página principal após 1.5s
+        setTimeout(async () => {
+          await navigateTo('/')
+        }, 1500)
+      } else {
+        showError(result.error || 'Erro ao atualizar funcionário')
+      }
     }
     
   } catch (error) {
@@ -249,8 +264,7 @@ const resetForm = () => {
 
 // Função para cancelar
 const handleCancel = () => {
-  // TODO: Implementar lógica de cancelar
-  console.log('Cancelar ação')
+  navigateTo('/')
 }
 
 // Preencher dados se estiver editando

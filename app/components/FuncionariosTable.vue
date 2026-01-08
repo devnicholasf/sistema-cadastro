@@ -59,6 +59,9 @@
             <th class="text-left py-4 px-4 font-semibold text-text-primary">
               Email
             </th>
+            <th class="text-center py-4 px-4 font-semibold text-text-primary">
+              Ações
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -81,6 +84,17 @@
               <span class="text-text-secondary">
                 {{ funcionario.email }}
               </span>
+            </td>
+            <td class="py-4 px-4">
+              <div class="flex justify-center">
+                <BaseButton
+                  variant="outline"
+                  size="sm"
+                  @click="editarFuncionario(funcionario.id)"
+                >
+                  Editar
+                </BaseButton>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -105,6 +119,11 @@ const { funcionarios, loading, error, fetchFuncionarios, clearError } = useFunci
 const handleRefresh = async () => {
   clearError()
   await fetchFuncionarios()
+}
+
+// Função para editar funcionário
+const editarFuncionario = (id: number) => {
+  navigateTo(`/funcionario/editar/${id}`)
 }
 
 // Buscar funcionários ao montar o componente
