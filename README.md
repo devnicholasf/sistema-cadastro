@@ -111,23 +111,26 @@ SUPABASE_KEY=sua_chave_publica_do_supabase_aqui
 ### **3. Configure o banco de dados**
 Execute no SQL Editor do Supabase:
 
+**1. Criar tabela de funcionários:**
 ```sql
--- Criar tabela de funcionários
-CREATE TABLE funcionarios (
-  id SERIAL PRIMARY KEY,
-  nome VARCHAR(255) NOT NULL,
-  cargo VARCHAR(255) NOT NULL,
-  endereco TEXT,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  salario DECIMAL(10,2) NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
+CREATE TABLE public.funcionarios (
+  id SERIAL NOT NULL,
+  nome TEXT NOT NULL,
+  cargo TEXT NOT NULL,
+  endereco TEXT NULL,
+  email TEXT NOT NULL,
+  salario NUMERIC(10, 2) NOT NULL,
+  CONSTRAINT funcionarios_pkey PRIMARY KEY (id),
+  CONSTRAINT funcionarios_email_key UNIQUE (email)
+) TABLESPACE pg_default;
+```
 
+**2. Habilitar Row Level Security:**
+```sql
 -- Habilitar Row Level Security
 ALTER TABLE funcionarios ENABLE ROW LEVEL SECURITY;
 
--- Criar políticas de acesso (exemplo para usuários autenticados)
+-- Criar políticas de acesso (usuários autenticados)
 CREATE POLICY "Usuários podem ver funcionários" ON funcionarios 
 FOR SELECT USING (auth.role() = 'authenticated');
 
@@ -139,6 +142,17 @@ FOR UPDATE USING (auth.role() = 'authenticated');
 
 CREATE POLICY "Usuários podem deletar funcionários" ON funcionarios 
 FOR DELETE USING (auth.role() = 'authenticated');
+```
+
+**3. Inserir dados de exemplo (opcional):**
+```sql
+INSERT INTO funcionarios (nome, cargo, endereco, email, salario)
+VALUES
+('Ana Paula Rodrigues', 'Assistente Administrativo', 'Rua São Jorge, 410 - Curitiba/PR', 'ana.rodrigues@empresa.com', 3200.00),
+('Felipe Martins Azevedo', 'Designer UX/UI', 'Av. Paulista, 1578 - São Paulo/SP', 'felipe.azevedo@empresa.com', 5800.00),
+('Juliana Ferreira Pires', 'Analista Financeiro', 'Rua Sete de Setembro, 990 - Porto Alegre/RS', 'juliana.pires@empresa.com', 6100.00),
+('Bruno Almeida Nogueira', 'Coordenador de TI', 'Av. Dom Pedro II, 230 - Campinas/SP', 'bruno.nogueira@empresa.com', 8900.00),
+('Patricia Gomes Leal', 'Recursos Humanos', 'Rua das Acácias, 75 - Goiânia/GO', 'patricia.leal@empresa.com', 4700.00);
 ```
 
 ## 🚀 Como Usar
