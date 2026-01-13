@@ -221,24 +221,18 @@ sistema-cadastro/
 - 🔔 **Toast System** - Notificações elegantes
 - 🗂️ **Modal System** - Confirmações seguras
 
-## 🤝 Contribuição
+## 🧠 Metodologia de Desenvolvimento
 
-Contribuições são sempre bem-vindas!
-
-1. **Fork** o projeto
-2. **Crie** sua feature branch (`git checkout -b feature/AmazingFeature`)
-3. **Commit** suas mudanças (`git commit -m 'Add: nova funcionalidade'`)
-4. **Push** para a branch (`git push origin feature/AmazingFeature`)
-5. **Abra** um Pull Request
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Este projeto foi desenvolvido utilizando:
+- **AI-Assisted Development** para otimização e boas práticas
+- **Arquitetura componentizada** para máxima reutilização
+- **TypeScript-first** approach para type safety
+- **Design patterns modernos** (Composables, SFC, etc.)
 
 ---
 
 <div align="center">
-  <p>Feito com ❤️ e ☕</p>
+  <p>Desenvolvido por Nicholas</p>
   <p>
     <strong>Sistema de Cadastro de Funcionários</strong><br>
     Moderno • Seguro • Responsivo
