@@ -17,8 +17,8 @@
 - [🚀 Como Usar](#-como-usar)
 - [📁 Estrutura do Projeto](#-estrutura-do-projeto)
 - [🎨 Interface](#-interface)
-- [🤝 Contribuição](#-contribuição)
-- [📄 Licença](#-licença)
+- [🧠 Metodologia de Desenvolvimento](#-metodologia-de-desenvolvimento)
+
 
 ## ✨ Funcionalidades
 
@@ -233,8 +233,4 @@ Este projeto foi desenvolvido utilizando:
 
 <div align="center">
   <p>Desenvolvido por Nicholas</p>
-  <p>
-    <strong>Sistema de Cadastro de Funcionários</strong><br>
-    Moderno • Seguro • Responsivo
-  </p>
 </div>
